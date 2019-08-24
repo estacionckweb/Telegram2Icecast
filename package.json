@@ -1,0 +1,16 @@
+{
+  "name": "telegram2icecast",
+  "version": "0.0.0",
+  "description": "",
+  "main": "t2i.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "download": "^7.1.0",
+    "icy": "^2.1.0",
+    "node-telegram-bot-api": "^0.30.0"
+  }
+}

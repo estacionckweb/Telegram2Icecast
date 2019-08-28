@@ -3,6 +3,8 @@ video/
 audio/
 texto/
 
+secret.js
+
 !foto/.gitkeep
 !video/.gitkeep
 !audio/.gitkeep

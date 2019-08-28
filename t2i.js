@@ -2,13 +2,12 @@ const TelegramBot = require('node-telegram-bot-api');
 var request = require('request');
 const fs = require('fs');
 const download = require('download');
+require('./secret');
 
-const token = '980219398:AAHbTl6ljSyRk6BikVnF6v2TItYfUYc1suM';
+var url = "https://api.telegram.org/" + TOKEN + "/getFile?file_id=";
+var urlFile = "https://api.telegram.org/file/" + TOKEN + "/";
 
-var url = "https://api.telegram.org/" + token + "/getFile?file_id=";
-var urlFile = "https://api.telegram.org/file/" + token + "/";
-
-const bot = new TelegramBot(token, {polling: true});
+const bot = new TelegramBot(TOKEN, {polling: true});
 
 // Maximo de tamaño de 20 megas
 

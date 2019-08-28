@@ -1,3 +1,8 @@
+foto/
+video/
+audio/
+texto/
+
 !foto/.gitkeep
 !video/.gitkeep
 !audio/.gitkeep

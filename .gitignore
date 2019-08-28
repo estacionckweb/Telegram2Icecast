@@ -1,5 +1,5 @@
-foto/*
-video/*
-audio/*
-texto/*
+!foto/.gitkeep
+!video/.gitkeep
+!audio/.gitkeep
+!texto/.gitkeep
 node_modules

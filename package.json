@@ -11,6 +11,7 @@
   "dependencies": {
     "download": "^7.1.0",
     "icy": "^2.1.0",
-    "node-telegram-bot-api": "^0.30.0"
+    "node-telegram-bot-api": "^0.30.0",
+    "request": "^2.88.0"
   }
 }

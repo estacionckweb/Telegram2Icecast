@@ -5,8 +5,8 @@ const download = require('download');
 
 const token = '980219398:AAHbTl6ljSyRk6BikVnF6v2TItYfUYc1suM';
 
-var url = "https://api.telegram.org/bot980219398:AAHbTl6ljSyRk6BikVnF6v2TItYfUYc1suM/getFile?file_id=";
-var urlFile = "https://api.telegram.org/file/bot980219398:AAHbTl6ljSyRk6BikVnF6v2TItYfUYc1suM/";
+var url = "https://api.telegram.org/" + token + "/getFile?file_id=";
+var urlFile = "https://api.telegram.org/file/" + token + "/";
 
 const bot = new TelegramBot(token, {polling: true});
 
@@ -18,47 +18,26 @@ bot.on('message', (msg) => {
   console.log(msg);
 
     if(msg.voice != null){
-        var newUrl = url + msg.voice.file_id;
-        request.get({
-            url: newUrl,
-            json: true,
-            headers: {'User-Agent': 'request'}
-        }, (err, res, data) => {
-            if (err) {
-            console.log('Error:', err);
-            } else if (res.statusCode !== 200) {
-            console.log('Status:', res.statusCode);
-            } else {
-                var fileUrl = urlFile + data.result.file_path;
-                download(fileUrl).then(data => {
-                    fs.writeFileSync('audio/' + msg.message_id + '.oga', data);
-                    bot.sendMessage(chatId, 'audio descargado');
-                });
-
-            }
-        });
+        descargaMedia(msg.voice, 'audio', 'oga', 'audio descargado');
     } else if(msg.photo != null){
-        var newUrl = url + msg.photo[2].file_id;
-        request.get({
-            url: newUrl,
-            json: true,
-            headers: {'User-Agent': 'request'}
-        }, (err, res, data) => {
-            if (err) {
-            console.log('Error:', err);
-            } else if (res.statusCode !== 200) {
-            console.log('Status:', res.statusCode);
-            } else {
-                var fileUrl = urlFile + data.result.file_path;
-                download(fileUrl).then(data => {
-                    fs.writeFileSync('foto/' + msg.message_id + '.jpg', data);
-                    bot.sendMessage(chatId, 'foto descargada');
-                });
-
-            }
-        });
+        descargaMedia(msg.photo, 'foto', 'jpg', 'foto descargada');
     } else if(msg.video != null){
-        var newUrl = url + msg.video.file_id;
+        descargaMedia(msg.video, 'video', 'mp4', 'video descargado');
+    } else if(msg.text != null){
+        fs.writeFileSync( darStringArchivo('texto', 'txt'), msg.text);
+        bot.sendMessage(chatId, 'mandaste un texto');
+    }
+
+    function darStringArchivo(carpeta, ext) {
+        return carpeta + '/' + msg.from.id + '_' + msg.from.first_name + '_' + msg.date + '_' + msg.message_id + '.' + ext;
+    }
+
+    function descargaMedia(paquete, carpeta, ext, msj_confirmacion){
+        var newUrl;
+        if(carpeta == 'foto') newUrl = url + paquete[2].file_id;
+        else newUrl = url + paquete.file_id;
+
+        
         request.get({
             url: newUrl,
             json: true,
@@ -70,10 +49,9 @@ bot.on('message', (msg) => {
             console.log('Status:', res.statusCode);
             } else {
                 var fileUrl = urlFile + data.result.file_path;
-                console.log(fileUrl);
                 download(fileUrl).then(data => {
-                    fs.writeFileSync('video/' + msg.message_id + '.mp4', data);
-                    bot.sendMessage(chatId, 'video descargado');
+                    fs.writeFileSync(darStringArchivo(carpeta, ext), data);
+                    bot.sendMessage(chatId, msj_confirmacion);
                 });
 
             }

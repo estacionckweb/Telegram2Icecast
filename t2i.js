@@ -4,8 +4,8 @@ const fs = require('fs');
 const download = require('download');
 require('./secret');
 
-var url = "https://api.telegram.org/" + TOKEN + "/getFile?file_id=";
-var urlFile = "https://api.telegram.org/file/" + TOKEN + "/";
+var url = "https://api.telegram.org/bot" + TOKEN + "/getFile?file_id=";
+var urlFile = "https://api.telegram.org/file/bot" + TOKEN + "/";
 
 const bot = new TelegramBot(TOKEN, {polling: true});
 

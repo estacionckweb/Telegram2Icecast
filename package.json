@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "child_process": "^1.0.2",
     "download": "^7.1.0",
     "icy": "^2.1.0",
     "node-telegram-bot-api": "^0.30.0",

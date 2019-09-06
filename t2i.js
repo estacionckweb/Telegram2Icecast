@@ -11,6 +11,20 @@ var urlFile = "https://api.telegram.org/file/bot" + TOKEN + "/";
 
 const bot = new TelegramBot(TOKEN, {polling: true});
 
+var express = require('express')
+var app = express()
+
+app.set('port', (process.env.PORT || 5000))
+app.use(express.static(__dirname + '/public'))
+
+app.get('/', function(request, response) {
+  response.send('Este es el historial del bot:')
+})
+
+app.listen(app.get('port'), function() {
+  console.log("corriendo en el puerto:" + app.get('port'))
+})
+
 // Maximo de tamaño de 20 megas
 
 bot.on('message', (msg) => {

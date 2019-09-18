@@ -3,6 +3,8 @@ var request = require('request');
 const fs = require('fs');
 const download = require('download');
 const { spawn } = require('child_process');
+var say = require('say');
+var ip = require("ip");
 require('./secret');
 
 var url = "https://api.telegram.org/bot" + TOKEN + "/getFile?file_id=";
@@ -12,9 +14,24 @@ var urlFile = "https://api.telegram.org/file/bot" + TOKEN + "/";
 
 const bot = new TelegramBot(TOKEN, {polling: true});
 
+var express = require('express')
+var app = express()
+
+app.set('port', (process.env.PORT || 5000))
+app.use(express.static(__dirname))
+
+app.get('/', function(request, response) {
+    res.sendFile(__dirname + '/index.html');
+})
+
+app.listen(app.get('port'), function() {
+  console.log("corriendo en el puerto:" + app.get('port'))
+})
+
 // Maximo de tamaño de 20 megas
 
 bot.on('message', (msg) => {
+    console.log(msg);
   const chatId = msg.chat.id;
 
   let rawjson = fs.readFileSync('datos.json');
@@ -28,8 +45,6 @@ bot.on('message', (msg) => {
     file: ''
   };
 
-//   console.log(msg);
-
     if(msg.voice != null){
         obj.type = 'audio';
         descargaMedia(msg.voice, 'audio', 'oga', 'audio descargado');
@@ -39,6 +54,8 @@ bot.on('message', (msg) => {
     } else if(msg.video != null){
         obj.type = 'video';
         descargaMedia(msg.video, 'video', 'mp4', 'video descargado');
+    } else if(msg.document != null){
+        descargaDocumento(msg.document, 'documentos', '');
     } else if(msg.text != null){
         obj.type = 'texto';
         obj.file = msg.text;
@@ -46,6 +63,9 @@ bot.on('message', (msg) => {
         parsedjson.push(obj);
         fs.writeFileSync('datos.json', JSON.stringify(parsedjson));
         bot.sendMessage(chatId, 'mandaste un texto');
+        say.speak(msg.text,'voice_el_diphone', (err) => {
+            console.log(err);
+        });
     }
 
     function darStringArchivo(carpeta, ext) {
@@ -71,28 +91,41 @@ bot.on('message', (msg) => {
                 var fileUrl = urlFile + data.result.file_path;
                 download(fileUrl).then(data => {
                     fs.writeFileSync(darStringArchivo(carpeta, ext), data);
-                    obj.file = darStringArchivo(carpeta, ext);
+                    if(carpeta == 'audio' || carpeta == 'video'){
+                        var play = spawn('cvlc', ['--no-video', './' + darStringArchivo(carpeta, ext)]);
+                        bot.sendMessage(chatId, 'se fue al streaming en vivo');
 
-                    parsedjson.push(obj);
-                    fs.writeFileSync('datos.json', JSON.stringify(parsedjson));
-                    var ffmpeg = spawn('ffmpeg', ['-i', './' + darStringArchivo(carpeta, ext), './archivo.mp3']);
-                    ffmpeg.on('exit', (statusCode) => {
-                        if(statusCode === 0) {
-                            bot.sendMessage(chatId, 'archivo convertido a wav');
+                        play.on('exit', (statusCode) => {
+                            console.log(statusCode);
+                        })
+                    }
+                    
+                    bot.sendMessage(chatId, 'ip local para revisar el historial: ' + ip.address());
+                }).catch((err) => {console.log(err)});
 
-                            // var stream = spawn('oggenc', ['-', '<', 'archivo.wav', '|', 'oggfwd', '88.99.123.96', '8000', 'n0alinea2', '/ckweb.ogg']);
-                            var stream = spawn('ffmpeg', ['-f', 'archivo.wav', 'icecast://source:n0alinea2@88.99.123.96:8000/nestorin']);
+            }
+        });
+    }
 
-                            stream.on('exit', (statusCode) => {
-                                // var remove = spawn('rm', ['archivo.wav']);
-                                console.log(statusCode);
-                            })
-                            // var remove = spawn('rm', ['archivo.wav']);
-                            // var stream = 
-                        }
-                    });
-                    bot.sendMessage(chatId, msj_confirmacion);
-                });
+    function descargaDocumento(paquete, carpeta, msj_confirmacion){
+        var newUrl;
+        newUrl = url + paquete.file_id;
+        
+        request.get({
+            url: newUrl,
+            json: true,
+            headers: {'User-Agent': 'request'}
+        }, (err, res, data) => {
+            if (err) {
+            console.log('Error:', err);
+            } else if (res.statusCode !== 200) {
+            console.log('Status:', res.statusCode);
+            } else {
+                var fileUrl = urlFile + data.result.file_path;
+                download(fileUrl).then(data => {
+                    fs.writeFileSync(darStringArchivo(carpeta, paquete.file_name), data);
+                    bot.sendMessage(chatId, 'ip local para revisar el historial: ' + ip.address() + ':' + app.get('port'));
+                }).catch((err) => {console.log(err)}
 
             }
         });

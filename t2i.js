@@ -97,7 +97,7 @@ bot.on('message', (msg) => {
                     parsedjson.push(obj);
                     fs.writeFileSync('datos.json', JSON.stringify(parsedjson));
                     bot.sendMessage(chatId, 'ip local para revisar el historial: ' + ip.address() + ':' + app.get('port'));
-                });
+                }).catch((err) => {console.log(err)});
 
             }
         });

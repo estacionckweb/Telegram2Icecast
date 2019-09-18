@@ -5,6 +5,7 @@ texto/
 
 secret.js
 archivo.mp3
+datos.json
 
 !foto/.gitkeep
 !video/.gitkeep

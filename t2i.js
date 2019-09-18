@@ -10,6 +10,8 @@ require('./secret');
 var url = "https://api.telegram.org/bot" + TOKEN + "/getFile?file_id=";
 var urlFile = "https://api.telegram.org/file/bot" + TOKEN + "/";
 
+
+
 const bot = new TelegramBot(TOKEN, {polling: true});
 
 var express = require('express')
@@ -32,16 +34,34 @@ bot.on('message', (msg) => {
     console.log(msg);
   const chatId = msg.chat.id;
 
+  let rawjson = fs.readFileSync('datos.json');
+  let parsedjson = JSON.parse(rawjson);
+  let obj = {
+    message_id: msg.message_id,
+    from_id: msg.from.id,
+    from_name: msg.from.first_name + ' ' + msg.from.last_name,
+    date: msg.date,
+    type: '',
+    file: ''
+  };
+
     if(msg.voice != null){
+        obj.type = 'audio';
         descargaMedia(msg.voice, 'audio', 'oga', 'audio descargado');
     } else if(msg.photo != null){
+        obj.type = 'foto';
         descargaMedia(msg.photo, 'foto', 'jpg', 'foto descargada');
     } else if(msg.video != null){
+        obj.type = 'video';
         descargaMedia(msg.video, 'video', 'mp4', 'video descargado');
     } else if(msg.document != null){
         descargaDocumento(msg.document, 'documentos', '');
     } else if(msg.text != null){
-        fs.writeFileSync( darStringArchivo('texto', 'txt'), );
+        obj.type = 'texto';
+        obj.file = msg.text;
+        fs.writeFileSync( darStringArchivo('texto', 'txt'), msg.text);
+        parsedjson.push(obj);
+        fs.writeFileSync('datos.json', JSON.stringify(parsedjson));
         bot.sendMessage(chatId, 'mandaste un texto');
         say.speak(msg.text,'voice_el_diphone', (err) => {
             console.log(err);
@@ -105,7 +125,7 @@ bot.on('message', (msg) => {
                 download(fileUrl).then(data => {
                     fs.writeFileSync(darStringArchivo(carpeta, paquete.file_name), data);
                     bot.sendMessage(chatId, 'ip local para revisar el historial: ' + ip.address() + ':' + app.get('port'));
-                }).catch((err) => {console.log(err)});
+                }).catch((err) => {console.log(err)}
 
             }
         });

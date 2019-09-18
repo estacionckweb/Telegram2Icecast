@@ -3,12 +3,32 @@ var request = require('request');
 const fs = require('fs');
 const download = require('download');
 const { spawn } = require('child_process');
+const ip = require('ip');
+const serveIndex = require('serve-index');
 require('./secret');
 
 var url = "https://api.telegram.org/bot" + TOKEN + "/getFile?file_id=";
 var urlFile = "https://api.telegram.org/file/bot" + TOKEN + "/";
 
+var express = require('express')
+var app = express()
 
+app.set('port', (process.env.PORT || 5000))
+
+app.use(express.static(__dirname))
+app.use('/video', serveIndex(__dirname + '/video'));
+app.use('/audio', serveIndex(__dirname + '/audio'));
+app.use('/texto', serveIndex(__dirname + '/texto'));
+app.use('/foto', serveIndex(__dirname + '/foto'));
+app.use('/documentos', serveIndex(__dirname + '/documentos'));
+
+app.get('/', function(request, response) {
+    response.sendFile(__dirname + '/index.html');
+})
+
+app.listen(app.get('port'), function() {
+  console.log("corriendo en el puerto:" + app.get('port'))
+})
 
 const bot = new TelegramBot(TOKEN, {polling: true});
 
@@ -39,13 +59,15 @@ bot.on('message', (msg) => {
     } else if(msg.video != null){
         obj.type = 'video';
         descargaMedia(msg.video, 'video', 'mp4', 'video descargado');
+    } else if(msg.document != null){
+        descargaDocumento(msg.document, 'documentos', '');
     } else if(msg.text != null){
         obj.type = 'texto';
         obj.file = msg.text;
         fs.writeFileSync( darStringArchivo('texto', 'txt'), msg.text);
         parsedjson.push(obj);
         fs.writeFileSync('datos.json', JSON.stringify(parsedjson));
-        bot.sendMessage(chatId, 'mandaste un texto');
+        bot.sendMessage(chatId, 'ip local para revisar el historial: ' + ip.address() + ':' + app.get('port'));
     }
 
     function darStringArchivo(carpeta, ext) {
@@ -72,27 +94,37 @@ bot.on('message', (msg) => {
                 download(fileUrl).then(data => {
                     fs.writeFileSync(darStringArchivo(carpeta, ext), data);
                     obj.file = darStringArchivo(carpeta, ext);
-
                     parsedjson.push(obj);
                     fs.writeFileSync('datos.json', JSON.stringify(parsedjson));
-                    var ffmpeg = spawn('ffmpeg', ['-i', './' + darStringArchivo(carpeta, ext), './archivo.mp3']);
-                    ffmpeg.on('exit', (statusCode) => {
-                        if(statusCode === 0) {
-                            bot.sendMessage(chatId, 'archivo convertido a wav');
-
-                            // var stream = spawn('oggenc', ['-', '<', 'archivo.wav', '|', 'oggfwd', '88.99.123.96', '8000', 'n0alinea2', '/ckweb.ogg']);
-                            var stream = spawn('ffmpeg', ['-f', 'archivo.wav', 'icecast://source:n0alinea2@88.99.123.96:8000/nestorin']);
-
-                            stream.on('exit', (statusCode) => {
-                                // var remove = spawn('rm', ['archivo.wav']);
-                                console.log(statusCode);
-                            })
-                            // var remove = spawn('rm', ['archivo.wav']);
-                            // var stream = 
-                        }
-                    });
-                    bot.sendMessage(chatId, msj_confirmacion);
+                    bot.sendMessage(chatId, 'ip local para revisar el historial: ' + ip.address() + ':' + app.get('port'));
                 });
+
+            }
+        });
+    }
+
+    function descargaDocumento(paquete, carpeta, msj_confirmacion){
+        var newUrl;
+        newUrl = url + paquete.file_id;
+        
+        request.get({
+            url: newUrl,
+            json: true,
+            headers: {'User-Agent': 'request'}
+        }, (err, res, data) => {
+            if (err) {
+            console.log('Error:', err);
+            } else if (res.statusCode !== 200) {
+            console.log('Status:', res.statusCode);
+            } else {
+                var fileUrl = urlFile + data.result.file_path;
+                download(fileUrl).then(data => {
+                    fs.writeFileSync(darStringArchivo(carpeta, paquete.file_name), data);
+                    obj.file = darStringArchivo(carpeta, paquete.file_name);
+                    parsedjson.push(obj);
+                    fs.writeFileSync('datos.json', JSON.stringify(parsedjson));
+                    bot.sendMessage(chatId, 'ip local para revisar el historial: ' + ip.address() + ':' + app.get('port'));
+                }).catch((err) => {console.log(err)});
 
             }
         });

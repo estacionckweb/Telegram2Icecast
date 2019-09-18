@@ -10,4 +10,5 @@ archivo.mp3
 !video/.gitkeep
 !audio/.gitkeep
 !texto/.gitkeep
+!documentos/.gitkeep
 node_modules

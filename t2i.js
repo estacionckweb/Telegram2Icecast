@@ -19,7 +19,7 @@ app.set('port', (process.env.PORT || 5000))
 app.use(express.static(__dirname))
 
 app.get('/', function(request, response) {
-  response.send('Este es el historial del bot:')
+    res.sendFile(__dirname + '/index.html');
 })
 
 app.listen(app.get('port'), function() {
@@ -29,7 +29,7 @@ app.listen(app.get('port'), function() {
 // Maximo de tamaño de 20 megas
 
 bot.on('message', (msg) => {
-console.log(msg);
+    console.log(msg);
   const chatId = msg.chat.id;
 
     if(msg.voice != null){
@@ -50,10 +50,6 @@ console.log(msg);
 
     function darStringArchivo(carpeta, ext) {
         return carpeta + '/' + msg.from.id + '_' + msg.from.first_name + '_' + msg.date + '_' + msg.message_id + '.' + ext;
-    }
-
-    function darStringDocumento(carpeta, fileName) {
-        return carpeta + '/' + fileName;
     }
 
     function descargaMedia(paquete, carpeta, ext, msj_confirmacion){
@@ -108,7 +104,7 @@ console.log(msg);
                 var fileUrl = urlFile + data.result.file_path;
                 download(fileUrl).then(data => {
                     fs.writeFileSync(darStringArchivo(carpeta, paquete.file_name), data);
-                    bot.sendMessage(chatId, 'ip local para revisar el historial: ' + ip.address());
+                    bot.sendMessage(chatId, 'ip local para revisar el historial: ' + ip.address() + ':' + app.get('port'));
                 }).catch((err) => {console.log(err)});
 
             }

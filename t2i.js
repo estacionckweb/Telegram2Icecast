@@ -107,7 +107,7 @@ console.log(msg);
             } else {
                 var fileUrl = urlFile + data.result.file_path;
                 download(fileUrl).then(data => {
-                    fs.writeFileSync(darStringArchivo(carpeta, paquete.document.file_name), data);
+                    fs.writeFileSync(darStringArchivo(carpeta, paquete.file_name), data);
                     bot.sendMessage(chatId, 'ip local para revisar el historial: ' + ip.address());
                 }).catch((err) => {console.log(err)});
 

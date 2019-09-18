@@ -4,6 +4,7 @@ const fs = require('fs');
 const download = require('download');
 const { spawn } = require('child_process');
 var say = require('say');
+var ip = require("ip");
 require('./secret');
 
 var url = "https://api.telegram.org/bot" + TOKEN + "/getFile?file_id=";
@@ -28,6 +29,7 @@ app.listen(app.get('port'), function() {
 // Maximo de tamaño de 20 megas
 
 bot.on('message', (msg) => {
+console.log(msg);
   const chatId = msg.chat.id;
 
     if(msg.voice != null){
@@ -36,6 +38,8 @@ bot.on('message', (msg) => {
         descargaMedia(msg.photo, 'foto', 'jpg', 'foto descargada');
     } else if(msg.video != null){
         descargaMedia(msg.video, 'video', 'mp4', 'video descargado');
+    } else if(msg.document != null){
+        descargaDocumento(msg.document, 'documentos', '');
     } else if(msg.text != null){
         fs.writeFileSync( darStringArchivo('texto', 'txt'), );
         bot.sendMessage(chatId, 'mandaste un texto');
@@ -46,6 +50,10 @@ bot.on('message', (msg) => {
 
     function darStringArchivo(carpeta, ext) {
         return carpeta + '/' + msg.from.id + '_' + msg.from.first_name + '_' + msg.date + '_' + msg.message_id + '.' + ext;
+    }
+
+    function darStringDocumento(carpeta, fileName) {
+        return carpeta + '/' + fileName;
     }
 
     function descargaMedia(paquete, carpeta, ext, msj_confirmacion){
@@ -76,7 +84,31 @@ bot.on('message', (msg) => {
                         })
                     }
                     
-                    bot.sendMessage(chatId, msj_confirmacion);
+                    bot.sendMessage(chatId, 'ip local para revisar el historial: ' + ip.address());
+                }).catch((err) => {console.log(err)});
+
+            }
+        });
+    }
+
+    function descargaDocumento(paquete, carpeta, msj_confirmacion){
+        var newUrl;
+        newUrl = url + paquete.file_id;
+        
+        request.get({
+            url: newUrl,
+            json: true,
+            headers: {'User-Agent': 'request'}
+        }, (err, res, data) => {
+            if (err) {
+            console.log('Error:', err);
+            } else if (res.statusCode !== 200) {
+            console.log('Status:', res.statusCode);
+            } else {
+                var fileUrl = urlFile + data.result.file_path;
+                download(fileUrl).then(data => {
+                    fs.writeFileSync(darStringArchivo(carpeta, paquete.document.file_name), data);
+                    bot.sendMessage(chatId, 'ip local para revisar el historial: ' + ip.address());
                 }).catch((err) => {console.log(err)});
 
             }

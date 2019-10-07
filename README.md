@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/alejoduque/DataZonContaMinacion/master/ckweb_ansi.png" /> <br>
+<img src="https://raw.githubusercontent.com/estacionckweb/Telegram2Icecast/master/t2i_logo.jpg" /> <br>
 
 
 # Telegram2Icecast

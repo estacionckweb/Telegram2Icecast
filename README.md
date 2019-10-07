@@ -9,12 +9,12 @@ Con t2i es posible que los archivos de audio sean transmitidos en tiempo real po
 
 Un bot (script) de Telegram captura todo lo que le envias y:
 
--Alamacena (Text,Docs,Video,Audio) en un servidor web. 
--Los audios son enviados, en orden de llegada a un streaming en icecast.
+-Alamacena (Text,Docs,Video,Audio) en un servidor web. <br>
+-Los audios son enviados, en orden de llegada a un streaming en icecast.<br>
 
 
 ### Corre con:
-node-v8.9.0-linux-armv6l en rPi - https://nodejs.org/dist/v8.9.0/node-v8.9.0-linux-armv6l.tar.gz
+node-v8.9.0-linux-armv6l en rPi - https://nodejs.org/dist/v8.9.0/node-v8.9.0-linux-armv6l.tar.gz <br>
 Codigo de Nestor@ckweb con ayudas en desarrollo de gstreamer en rpi de juan kalash 
 
 ## Pasos a seguir para correr una instancia en un computador con Node.js instalado

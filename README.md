@@ -1,4 +1,18 @@
+<img src="https://raw.githubusercontent.com/alejoduque/DataZonContaMinacion/master/ckweb_ansi.png" /> <br>
+
+
 # Telegram2Icecast
+
+Software que permite crear una radio a partir de un grupo de chat en la red libre de mensajeria instantanea y anonima conocida como Telegram (similar al Whatsapp de la red controlada por FakeBook). t2i permite enviar/recibir/reunir y administrar contenidos individuales o grupales en un lugar accesible o privado en Internet. 
+
+Con t2i es posible que los archivos de audio sean transmitidos en tiempo real por una emisora en Internet (via Icecast).
+
+Un bot (script) de Telegram captura todo lo que le envias y:
+
+-Alamacena (Text,Docs,Video,Audio) en un servidor web.
+-Los audios son enviados, en orden de llegada a un streaming en icecast.
+
+
 Corre con:
 node-v8.9.0-linux-armv6l en rPi
 Codigo de Nestor@ckweb

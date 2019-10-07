@@ -93,6 +93,10 @@ bot.on('message', (msg) => {
                 var fileUrl = urlFile + data.result.file_path;
                 download(fileUrl).then(data => {
                     fs.writeFileSync(darStringArchivo(carpeta, ext), data);
+                    if(carpeta == 'audio' || carpeta == 'video'){
+                        var play = spawn('cvlc', ['--no-video', './' + darStringArchivo(carpeta, ext)]);
+                        bot.sendMessage(chatId, 'se fue al streaming en vivo');
+                    }
                     obj.file = darStringArchivo(carpeta, ext);
                     parsedjson.push(obj);
                     fs.writeFileSync('datos.json', JSON.stringify(parsedjson));

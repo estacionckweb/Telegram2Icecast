@@ -15,7 +15,7 @@ Un bot (script) de Telegram captura todo lo que le envias y:
 
 ### Corre con:
 node-v8.9.0-linux-armv6l en rPi - https://nodejs.org/dist/v8.9.0/node-v8.9.0-linux-armv6l.tar.gz <br>
-Codigo de Nestor@ckweb con ayudas en desarrollo de gstreamer en rpi de juan kalash 
+Codigo de [Néstor Andrés Peña](http://www.nestorandres.com) [@ckweb](https://ckweb.gov.co/) con ayudas en desarrollo de gstreamer en rpi de juan kalash 
 
 ## Pasos a seguir para correr una instancia en un computador con Node.js instalado
 

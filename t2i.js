@@ -13,6 +13,10 @@ var urlFile = "https://api.telegram.org/file/bot" + TOKEN + "/";
 var express = require('express')
 var app = express()
 
+var reproducidos = [];
+var pendientes = [];
+var sonando = false;
+
 app.set('port', (process.env.PORT || 5000))
 
 app.use(express.static(__dirname))
@@ -94,7 +98,9 @@ bot.on('message', (msg) => {
                 download(fileUrl).then(data => {
                     fs.writeFileSync(darStringArchivo(carpeta, ext), data);
                     if(carpeta == 'audio' || carpeta == 'video'){
-                        var play = spawn('cvlc', ['--no-video', '--started-from-file', '--playlist-enqueue' ,'./' + darStringArchivo(carpeta, ext)]);
+                        pendientes.push('./' + darStringArchivo(carpeta, ext));
+                        if(!sonando)
+                            reproducirStream();
                         bot.sendMessage(chatId, 'se fue al streaming en vivo');
                     }
                     obj.file = darStringArchivo(carpeta, ext);
@@ -136,3 +142,23 @@ bot.on('message', (msg) => {
     
 });
 
+function reproducirStream() {
+    if(pendientes.length > 0){
+        sonando = true;
+        var play = spawn('cvlc', ['--no-video', '--play-and-exit' , pendientes[0]]);
+        play.on('exit', () => {
+            reproducidos.push(pendientes[0]);
+            pendientes.splice(0,1);
+            sonando = false;
+            reproducirStream();
+        });
+    } else if(reproducidos.length > 0){
+        sonando = true;
+        var random = Math.floor(Math.random() * reproducidos.length);
+        var play = spawn('cvlc', ['--no-video', '--play-and-exit' , reproducidos[random]]);
+        play.on('exit', () => {
+            sonando = false;
+            reproducirStream();
+        });
+    }
+}

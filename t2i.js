@@ -148,7 +148,7 @@ function reproducirStream() {
         var play = spawn('cvlc', ['--no-video', '--play-and-exit' , pendientes[0]]);
         play.on('exit', function() {
             reproducidos.push(pendientes[0]);
-            pendientes.splice(0,1);
+            pendientes = pendientes.slice(1);
             sonando = false;
             reproducirStream();
         });

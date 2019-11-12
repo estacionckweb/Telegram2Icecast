@@ -146,7 +146,7 @@ function reproducirStream() {
     if(pendientes.length > 0){
         sonando = true;
         var play = spawn('cvlc', ['--no-video', '--play-and-exit' , pendientes[0]]);
-        play.on('exit', () => {
+        play.on('exit', function() {
             reproducidos.push(pendientes[0]);
             pendientes.splice(0,1);
             sonando = false;
@@ -156,7 +156,7 @@ function reproducirStream() {
         sonando = true;
         var random = Math.floor(Math.random() * reproducidos.length);
         var play = spawn('cvlc', ['--no-video', '--play-and-exit' , reproducidos[random]]);
-        play.on('exit', () => {
+        play.on('exit', function() {
             sonando = false;
             reproducirStream();
         });

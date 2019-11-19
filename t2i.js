@@ -52,7 +52,7 @@ bot.on('message', (msg) => {
     file: ''
   };
 
-//   console.log(msg);
+  console.log(msg);
 
     if(msg.voice != null){
         obj.type = 'audio';
@@ -99,9 +99,12 @@ bot.on('message', (msg) => {
                     fs.writeFileSync(darStringArchivo(carpeta, ext), data);
                     if(carpeta == 'audio' || carpeta == 'video'){
                         pendientes.push('./' + darStringArchivo(carpeta, ext));
-                        if(!sonando)
-                            reproducirStream();
-                        bot.sendMessage(chatId, 'se fue al streaming en vivo');
+                        if(!sonando){
+                            if(msg.voice.file_size < 57000 && carpeta == 'audio'){
+                                reproducirStream();
+                                bot.sendMessage(chatId, 'se fue al streaming en vivo');
+                            }
+                        }
                     }
                     obj.file = darStringArchivo(carpeta, ext);
                     parsedjson.push(obj);

@@ -97,14 +97,12 @@ bot.on('message', (msg) => {
                 var fileUrl = urlFile + data.result.file_path;
                 download(fileUrl).then(data => {
                     fs.writeFileSync(darStringArchivo(carpeta, ext), data);
-                    if(carpeta == 'audio' || carpeta == 'video'){
+                    if(carpeta == 'audio' && msg.voice.file_size < 57000){
                         pendientes.push('./' + darStringArchivo(carpeta, ext));
                         if(!sonando){
-                            if(msg.voice.file_size < 57000 && carpeta == 'audio'){
-                                reproducirStream();
-                                bot.sendMessage(chatId, 'se fue al streaming en vivo');
-                            }
+                            reproducirStream();
                         }
+                        bot.sendMessage(chatId, 'se fue al streaming en vivo');
                     }
                     obj.file = darStringArchivo(carpeta, ext);
                     parsedjson.push(obj);

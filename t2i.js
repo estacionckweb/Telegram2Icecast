@@ -13,6 +13,10 @@ var urlFile = "https://api.telegram.org/file/bot" + TOKEN + "/";
 var express = require('express')
 var app = express()
 
+var reproducidos = [];
+var pendientes = [];
+var sonando = false;
+
 app.set('port', (process.env.PORT || 5000))
 
 app.use(express.static(__dirname))
@@ -48,7 +52,7 @@ bot.on('message', (msg) => {
     file: ''
   };
 
-//   console.log(msg);
+  console.log(msg);
 
     if(msg.voice != null){
         obj.type = 'audio';
@@ -93,8 +97,16 @@ bot.on('message', (msg) => {
                 var fileUrl = urlFile + data.result.file_path;
                 download(fileUrl).then(data => {
                     fs.writeFileSync(darStringArchivo(carpeta, ext), data);
+<<<<<<< HEAD
                     if(carpeta == 'audio' || carpeta == 'video'){
 //                        var play = spawn('cvlc', ['--no-video', './' + darStringArchivo(carpeta, ext)]);
+=======
+                    if(carpeta == 'audio' && msg.voice.file_size < 57000){
+                        pendientes.push('./' + darStringArchivo(carpeta, ext));
+                        if(!sonando){
+                            reproducirStream();
+                        }
+>>>>>>> 1851462a661e182422d5473f72c172ff5211496d
                         bot.sendMessage(chatId, 'se fue al streaming en vivo');
                     }
                     obj.file = darStringArchivo(carpeta, ext);
@@ -136,3 +148,23 @@ bot.on('message', (msg) => {
     
 });
 
+function reproducirStream() {
+    if(pendientes.length > 0){
+        sonando = true;
+        var play = spawn('cvlc', ['--no-video', '--play-and-exit' , pendientes[0]]);
+        play.on('exit', function() {
+            reproducidos.push(pendientes[0]);
+            pendientes = pendientes.slice(1);
+            sonando = false;
+            reproducirStream();
+        });
+    } else if(reproducidos.length > 0){
+        sonando = true;
+        var random = Math.floor(Math.random() * reproducidos.length);
+        var play = spawn('cvlc', ['--no-video', '--play-and-exit' , reproducidos[random]]);
+        play.on('exit', function() {
+            sonando = false;
+            reproducirStream();
+        });
+    }
+}

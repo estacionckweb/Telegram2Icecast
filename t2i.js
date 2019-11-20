@@ -94,7 +94,7 @@ bot.on('message', (msg) => {
                 download(fileUrl).then(data => {
                     fs.writeFileSync(darStringArchivo(carpeta, ext), data);
                     if(carpeta == 'audio' || carpeta == 'video'){
-                        var play = spawn('cvlc', ['--no-video', './' + darStringArchivo(carpeta, ext)]);
+//                        var play = spawn('cvlc', ['--no-video', './' + darStringArchivo(carpeta, ext)]);
                         bot.sendMessage(chatId, 'se fue al streaming en vivo');
                     }
                     obj.file = darStringArchivo(carpeta, ext);
